@@ -46,4 +46,24 @@ public class Chatters {
         }
     }
 
+
+    // Metodo para enviar a un usuario en especifico
+    public void sendMessageToUser(String Clientname, String  addressee, String message) {
+        if(existeUsr(addressee)){
+            synchronized (clientes) {
+                for (Person user : clientes ){
+                    if(user.getName().equalsIgnoreCase(addressee)){
+                        try {
+                            user.getOut().println("(Chat privado:)" + Clientname + ": " + message);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }else{
+            broadcastMessage(message);
+        }
+    }
+
 }

@@ -15,11 +15,16 @@ el mensaje es enviado a todos incluido el usuario
 que envió el mensaje. Proponer una estrategia 
 para evitar que el mismo usuario reciba el mensaje.
 
-Si se desea enviar un mensaje privado debe usar la sintaxis:
+Si se desea enviar un mensaje privado se debe manejar la sintaxis de manera que:
 usuarioDestino:mensaje
-por ejemplo
 
-Juan:hola juan cómo estas?
+Es decir, desde el chat del destinatario debe ingresar el nombre de hacia quien va el mensaje, ejemplo:
+
+Usuario1
+Usuario2: hola
+
+Entonces Usuario2 verá lo siguiente:
+(chat privado:) Usuario1: hola
 
 # Integrantes:
 
