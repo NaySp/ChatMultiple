@@ -1,12 +1,20 @@
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
+
 
 public class Client {
     // Dirección IP y puerto del servidor
     private static final String SERVER_IP = "127.0.0.1";
     private static final int PORT = 6789;
 
+    public static Scanner sc = new Scanner(System.in);
+    public static boolean calling = false;
+    public static Lector clnt = new Lector(null);
+
+
     public static void main(String[] args) {
+
         try {
             // Establecer conexión con el servidor
             Socket socket = new Socket(SERVER_IP, PORT);
@@ -16,6 +24,8 @@ public class Client {
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            
 
             // Leer mensajes del servidor
             String message;
@@ -35,6 +45,7 @@ public class Client {
             Lector lector = new Lector(in);
             new Thread(lector).start();
 
+            
             // Leer mensajes del usuario y enviar al servidor
             while ((message = userInput.readLine()) != null) {
                 out.println(message);
@@ -43,8 +54,14 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        String msg = sc.nextLine();
+        if(msg.equals("Llamar")){
+            clnt.init_audio();
+            msg = sc.nextLine();
+            if(msg.equals("Colgar")){
+                clnt.end_audio();
+            }
+        }
     }
-    
-
-    
 }
