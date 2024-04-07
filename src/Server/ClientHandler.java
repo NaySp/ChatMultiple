@@ -45,14 +45,13 @@ class ClientHandler implements Runnable {
             String message;
             // Esperar y manejar mensajes de los clientes
             while ((message = in.readLine()) != null) {
-                if(message.contains(":")){
-                    handlePrivateMessage(message);                    
-                }else{
+                if (message.contains(":")) {
+                    handlePrivateMessage(message);
+                } else {
                     clientes.broadcastMessage(clientName + ": " + message);
                 }
-                
-            }
 
+            }
 
         } catch (IOException e) {
             // Manejar errores de E/S

@@ -1,5 +1,6 @@
 import java.util.Set;
-import java.io.PrintWriter;
+import java.io.*;
+
 import java.util.HashSet;
 
 public class Chatters {
@@ -43,27 +44,48 @@ public class Chatters {
     public void broadcastMessage(String message) {
         for (Person p : clientes) {
             p.getOut().println(message);
+            guardarMensaje(p.getName(), message); // Guardar el mensaje en el historial del cliente
         }
     }
 
-
     // Metodo para enviar a un usuario en especifico
-    public void sendMessageToUser(String Clientname, String  addressee, String message) {
-        if(existeUsr(addressee)){
+    public void sendMessageToUser(String Clientname, String addressee, String message) {
+        if (existeUsr(addressee)) {
             synchronized (clientes) {
-                for (Person user : clientes ){
-                    if(user.getName().equalsIgnoreCase(addressee)){
+                for (Person user : clientes) {
+                    if (user.getName().equalsIgnoreCase(addressee)) {
                         try {
                             user.getOut().println("(Chat privado:)" + Clientname + ": " + message);
+                            guardarMensaje(addressee, "(Chat privado:)" + Clientname + ": " + message); // Guardar el
+                                                                                                        // mensaje en el
+                                                                                                        // historial del
+                                                                                                        // cliente
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
-        }else{
+        } else {
             broadcastMessage(message);
+            guardarMensaje(Clientname, message); // Guardar el mensaje en el historial del cliente que lo envió
         }
     }
 
+    public void guardarMensaje(String cliente, String mensaje) {
+        // Buscar al cliente en el conjunto de clientes
+        for (Person p : clientes) {
+            if (p.getName().equals(cliente)) {
+                // Escribir el mensaje en el archivo del cliente
+                try (FileWriter fileWriter = new FileWriter(cliente + ".txt", true);
+                        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+                        PrintWriter printWriter = new PrintWriter(bufferedWriter)) {
+                    printWriter.println(mensaje);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
 }
