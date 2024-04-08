@@ -41,6 +41,10 @@ class ClientHandler implements Runnable {
                     }
                 }
             }
+            AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
+            recorderPlayer.record();
+            Audio audio = recorderPlayer.getAudioToSend();
+            recorderPlayer.play(audio);
 
             String message;
             // Esperar y manejar mensajes de los clientes
