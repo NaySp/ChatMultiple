@@ -24,6 +24,17 @@ public class Chatters {
         return response;
     }
 
+    // Devuelve el flujo de salida de un usuario en línea
+    public PrintWriter getUserStream(String name) {
+        for (Person person : clientes) {
+            if (person.getName().equalsIgnoreCase(name)) {
+                return person.getOut();
+            }
+        }
+        return null; // Retornar null si el usuario no está en línea o no existe
+    }
+    
+
     // Agrega un usuario al chat si el nombre no está vacío y no está en uso
     public void addUsr(String name, PrintWriter out) {
         if (!name.isBlank() && !existeUsr(name)) {
