@@ -1,5 +1,9 @@
 import java.io.*;
 import java.net.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
 
 class ClientHandler implements Runnable {
     private Socket clientSocket;
@@ -125,7 +129,35 @@ class ClientHandler implements Runnable {
         AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
         recorderPlayer.record();
         Audio audio = recorderPlayer.getAudioToSend();
-        recorderPlayer.play(audio);
+        //Solicitar al remitente del mensaje el destinatario del audio
+        out.println("Por favor, introduce el nombre del destinatario del audio:");
+        try {
+            // Obtener el nombre del destinatario del audio
+            String recipientName = in.readLine(); // Corrected here
+            // Obtener el PrintWriter del destinatario del audio
+            PrintWriter recipientOut = clientes.getUserStream(recipientName);
+            if (recipientOut != null) {
+                // Enviar solicitud de reproducción al destinatario del audio
+                recipientOut.println(clientName + " te ha enviado un audio. ¿Deseas reproducirlo? (y/n)");
+                // Esperar la respuesta del destinatario
+                String response = in.readLine(); // Corrected here
+                if (response.equalsIgnoreCase("y")) {
+                    // Si el destinatario desea reproducir el audio, entonces reproducirlo
+                    recorderPlayer.play(audio);
+                } else {
+                    // Si el destinatario no desea reproducir el audio, no hacer nada
+                    out.println("Audio no reproducido por el destinatario.");
+                }
+            } else {
+                // Si el destinatario no está en línea, informar al remitente
+                out.println("El destinatario no está en línea o no existe.");
+            }
+        } catch (IOException e) {
+            // Manejar errores de E/S
+            e.printStackTrace();
+        }
+    
     }
+    
 
 }
