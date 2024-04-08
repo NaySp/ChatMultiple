@@ -1,0 +1,25 @@
+nay se ha unido al chat.
+isa se ha unido al chat.
+tapi: hola
+nay: playCall
+isa: playCall
+isa ha abandonado el chat.
+nay: recordAudio
+nay ha abandonado el chat.
+nay se ha unido al chat.
+nay: hola
+tapi: hola
+tapi ha abandonado el chat.
+nay se ha unido al chat.
+nay: hol
+nay: hola
+nay: 
+nay: 
+tapi ha abandonado el chat.
+nay se ha unido al chat.
+nay: hello
+nay: hi 
+nay: fuck
+tapi: 
+tapi: co¤o
+tapi ha abandonado el chat.

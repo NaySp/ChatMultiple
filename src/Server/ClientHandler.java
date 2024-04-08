@@ -1,6 +1,11 @@
 import java.io.*;
 import java.net.*;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.SourceDataLine;
+
 class ClientHandler implements Runnable {
     private Socket clientSocket;
     private BufferedReader in;
@@ -59,12 +64,24 @@ class ClientHandler implements Runnable {
                     handlePrivateMessage(message);
                 } else if(message.startsWith("/recordAudio")){
                     handleRecordAudio();
+                } else if(message.startsWith("/calling")){
+                    new Thread(() -> {
+                        try {
+                          playCall();
+                        } catch (Exception e) {
+                          e.printStackTrace();
+                        }
+                      })
+                        .start();
+
                 } else {
                     clientes.broadcastMessage(clientName + ": " + message);
                 }
             }
         } catch (IOException e) {
             // Manejar errores de E/S
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 // Cerrar el socket y eliminar al usuario del chat al salir
@@ -127,5 +144,39 @@ class ClientHandler implements Runnable {
         Audio audio = recorderPlayer.getAudioToSend();
         recorderPlayer.play(audio);
     }
+
+    private void playCall() throws Exception {
+        DatagramSocket serverSocket = new DatagramSocket(6789);
+        System.out.println("\nServer started. Waiting for clients...\n");
+    
+        // Configurar la línea de audio para reproducir el audio recibido
+        AudioFormat audioFormat = new AudioFormat(44100.0f, 16, 2, true, false);
+        DataLine.Info dataLineInfo = new DataLine.Info(
+          SourceDataLine.class,
+          audioFormat
+        );
+        SourceDataLine sourceDataLine = (SourceDataLine) AudioSystem.getLine(
+          dataLineInfo
+        );
+        sourceDataLine.open(audioFormat);
+        sourceDataLine.start();
+    
+        byte[] receiveData = new byte[1024];
+    
+        while (true) {
+          DatagramPacket receivePacket = new DatagramPacket(
+            receiveData,
+            receiveData.length
+          );
+          serverSocket.receive(receivePacket);
+    
+          // Reproducir audio
+          sourceDataLine.write(
+            receivePacket.getData(),
+            0,
+            receivePacket.getLength()
+          );
+        }
+      }
 
 }
