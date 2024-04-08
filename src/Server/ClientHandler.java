@@ -41,11 +41,8 @@ class ClientHandler implements Runnable {
                     }
                 }
             }
-            AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
-            recorderPlayer.record();
-            Audio audio = recorderPlayer.getAudioToSend();
-            recorderPlayer.play(audio);
 
+           
             String message;
             // Esperar y manejar mensajes de los clientes
             while ((message = in.readLine()) != null) {
@@ -60,6 +57,8 @@ class ClientHandler implements Runnable {
 
                 } else if (message.contains(":")) {
                     handlePrivateMessage(message);
+                } else if(message.startsWith("/recordAudio")){
+                    handleRecordAudio();
                 } else {
                     clientes.broadcastMessage(clientName + ": " + message);
                 }
@@ -121,4 +120,12 @@ class ClientHandler implements Runnable {
         String privateMessage = parts[1].trim();
         clientes.sendMessageToUser(clientName, receiver, privateMessage);
     }
+
+    private void handleRecordAudio(){
+        AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
+        recorderPlayer.record();
+        Audio audio = recorderPlayer.getAudioToSend();
+        recorderPlayer.play(audio);
+    }
+
 }
