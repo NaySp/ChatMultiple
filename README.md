@@ -26,6 +26,29 @@ Usuario2: hola
 Entonces Usuario2 verá lo siguiente:
 (chat privado:) Usuario1: hola
 
+si se deseas crear un grupo se utiliza el comando /createGroup NOMBRE_GRUPO
+ejemplo: /createGroup Grupo1
+Entonces se verá lo siguiente:
+Grupo 'Grupo1' creado correctamente.
+
+si se deseas ingresar a un grupo se utiliza el comando /join NOMBRE_GRUPO
+ejemplo: /join Grupo1
+Entonces se verá lo siguiente:
+Te has unido al grupo 'Grupo1'.
+
+si se deseas enviar un mensaje a un grupo se utiliza el comando /group NOMBRE_GRUPO MENSAJE
+ejemplo: /group Grupo1 mensaje
+Entonces se verá lo siguiente:
+Mensaje enviado al grupo 'Grupo1'.
+
+si se deseas salirte de un grupo se utiliza el comando /leaveGroup NOMBRE_GRUPO
+ejemplo: /group Grupo1 mensaje
+Entonces se verá lo siguiente:
+Mensaje enviado al grupo 'Grupo1'.
+
+
+
+
 # Integrantes:
 
 - Isabella Ocampo

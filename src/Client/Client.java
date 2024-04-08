@@ -48,7 +48,13 @@ public class Client {
             
             // Leer mensajes del usuario y enviar al servidor
             while ((message = userInput.readLine()) != null) {
-                out.println(message);
+                if (message.startsWith("/createGroup")) {
+                    out.println(message);
+                } else if (message.startsWith("/leaveGroup")) {
+                    out.println(message);
+                } else {
+                    out.println(message);
+                }
             }
 
         } catch (IOException e) {

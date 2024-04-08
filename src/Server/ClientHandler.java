@@ -45,15 +45,21 @@ class ClientHandler implements Runnable {
             String message;
             // Esperar y manejar mensajes de los clientes
             while ((message = in.readLine()) != null) {
-                if(message.contains(":")){
-                    handlePrivateMessage(message);                    
-                }else{
+                if (message.startsWith("/createGroup")) {
+                    handleCreateGroup(message);
+                } else if (message.startsWith("/join")) {
+                    handleJoinGroup(message);
+                } else if (message.startsWith("/group")) {
+                    handleGroupMessage(message);
+                } else if (message.startsWith("/leaveGroup")) {
+                    handleLeaveGroup(message);
+
+                } else if (message.contains(":")) {
+                    handlePrivateMessage(message);
+                } else {
                     clientes.broadcastMessage(clientName + ": " + message);
                 }
-                
             }
-
-
         } catch (IOException e) {
             // Manejar errores de E/S
         } finally {
@@ -66,6 +72,42 @@ class ClientHandler implements Runnable {
             } catch (IOException e) {
                 // Manejar errores al cerrar el socket
             }
+        }
+    }
+
+    private void handleJoinGroup(String message) {
+        String[] parts = message.split(" ");
+        if (parts.length >= 2) {
+            String groupName = parts[1];
+            clientes.addUserToGroup(groupName, new Person(clientName, out));
+            out.println("Te has unido al grupo '" + groupName + "'.");
+        }
+    }
+
+    private void handleGroupMessage(String message) {
+        String[] parts = message.split(" ", 3);
+        if (parts.length >= 3) {
+            String groupName = parts[1];
+            String groupMessage = parts[2];
+            clientes.sendMessageToGroup(groupName, clientName + ": " + groupMessage);
+            out.println("Mensaje enviado al grupo '" + groupName + "'.");
+        }
+    }
+
+    private void handleCreateGroup(String message) {
+        String[] parts = message.split(" ");
+        if (parts.length >= 2) {
+            String groupName = parts[1];
+            clientes.createGroup(groupName);
+            out.println("Grupo '" + groupName + "' creado correctamente.");
+        }
+    }
+
+    private void handleLeaveGroup(String message) {
+        String[] parts = message.split(" ");
+        if (parts.length >= 2) {
+            String groupName = parts[1];
+            clientes.removeUserFromGroup(groupName, clientName);
         }
     }
 
