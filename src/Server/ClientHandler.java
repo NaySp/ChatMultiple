@@ -10,6 +10,11 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.List;
+
 class ClientHandler implements Runnable {
     private Socket clientSocket;
     private BufferedReader in;
@@ -35,7 +40,7 @@ class ClientHandler implements Runnable {
         try {
             // Pedir al cliente que ingrese su nombre
             while (true) {
-                out.println("SUBMITNAME");
+                out.println("Ingresa tu nombre");
                 clientName = in.readLine();
                 if (clientName == null) {
                     return;
@@ -44,8 +49,9 @@ class ClientHandler implements Runnable {
                     // Verificar si el nombre está disponible y agregar al usuario al chat
                     if (!clientName.isBlank() && !clientes.existeUsr(clientName)) {
                         clientes.broadcastMessage(clientName + " se ha unido al chat.");
-                        out.println("NAMEACCEPTED" + clientName);
-                        clientes.addUsr(clientName, out);
+                        out.println("NOMBRE ACEPTADO: " + clientName);
+                        clientes.addUsr(clientName, out, clientSocket);
+                        
                         break;
                     }
                 }
@@ -63,11 +69,14 @@ class ClientHandler implements Runnable {
                     handleGroupMessage(message);
                 } else if (message.startsWith("/leaveGroup")) {
                     handleLeaveGroup(message);
-
                 } else if (message.contains(":")) {
                     handlePrivateMessage(message);
+
+
                 } else if(message.startsWith("/recordAudio")){
-                    handleRecordAudio();
+                    handleRecordAudio(message, "grupo");
+                    
+                  
                 } else if(message.startsWith("/calling")){
                     new Thread(() -> {
                         try {
@@ -103,7 +112,7 @@ class ClientHandler implements Runnable {
         String[] parts = message.split(" ");
         if (parts.length >= 2) {
             String groupName = parts[1];
-            clientes.addUserToGroup(groupName, new Person(clientName, out));
+            clientes.addUserToGroup(groupName, new Person(clientName, out, clientSocket));
             out.println("Te has unido al grupo '" + groupName + "'.");
         }
     }
@@ -117,6 +126,7 @@ class ClientHandler implements Runnable {
             out.println("Mensaje enviado al grupo '" + groupName + "'.");
         }
     }
+    
 
     private void handleCreateGroup(String message) {
         String[] parts = message.split(" ");
@@ -126,6 +136,8 @@ class ClientHandler implements Runnable {
             out.println("Grupo '" + groupName + "' creado correctamente.");
         }
     }
+    
+
 
     private void handleLeaveGroup(String message) {
         String[] parts = message.split(" ");
@@ -142,41 +154,79 @@ class ClientHandler implements Runnable {
         clientes.sendMessageToUser(clientName, receiver, privateMessage);
     }
 
-    private void handleRecordAudio(){
-        AudioRecorderPlayer recorderPlayer = new AudioRecorderPlayer();
-        recorderPlayer.record();
-        Audio audio = recorderPlayer.getAudioToSend();
-        //Solicitar al remitente del mensaje el destinatario del audio
-        out.println("Por favor, introduce el nombre del destinatario del audio:");
+    // Nuevo método para manejar la grabación de audio
+    private void handleRecordAudio(String message, String groupName) {
         try {
-            // Obtener el nombre del destinatario del audio
-            String recipientName = in.readLine(); // Corrected here
-            // Obtener el PrintWriter del destinatario del audio
-            PrintWriter recipientOut = clientes.getUserStream(recipientName);
-            if (recipientOut != null) {
-                // Enviar solicitud de reproducción al destinatario del audio
-                recipientOut.println(clientName + " te ha enviado un audio. ¿Deseas reproducirlo? (y/n)");
-                // Esperar la respuesta del destinatario
-                String response = in.readLine(); // Corrected here
-                if (response.equalsIgnoreCase("y")) {
-                    // Si el destinatario desea reproducir el audio, entonces reproducirlo
-                    recorderPlayer.play(audio);
-                } else {
-                    // Si el destinatario no desea reproducir el audio, no hacer nada
-                    out.println("Audio no reproducido por el destinatario.");
-                }
-            } else {
-                // Si el destinatario no está en línea, informar al remitente
-                out.println("El destinatario no está en línea o no existe.");
+            // Lógica para grabar el audio desde el socket del cliente y guardar en un archivo
+            System.out.println("Grabando audio...");
+            InputStream inputStream = this.clientSocket.getInputStream();
+            int randomNumber = 1 + new Random().nextInt(100000);
+            String fileName = "./db/received_audio" + randomNumber + ".wav";
+            System.out.println("Archivo de audio: " + fileName);
+
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(fileName));
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) > 0) {
+                bufferedOutputStream.write(buffer, 0, bytesRead);
+            }
+            bufferedOutputStream.close();
+
+            // Obtener el tipo de envío (grupo o usuario) desde el mensaje
+            String sendOption = message.split(" ")[1]; // Cambiado a índice 1
+            System.out.println("sendOption: " + sendOption);
+            
+            if (sendOption.equals("group")) {
+                handleGroupAudio(fileName, groupName);
+            } else if (sendOption.equals("user")) {
+                handleUserAudio(message, fileName);
             }
         } catch (IOException e) {
-            // Manejar errores de E/S
             e.printStackTrace();
+            System.err.println("Error al grabar audio.");
         }
-    
     }
-    
 
+
+    // Método para manejar el env<ío de audio a un grupo
+    private void handleGroupAudio(String fileName, String groupName) {
+        Set<Person> groupMembers = clientes.getGroup(groupName);
+        try {
+            for (Person member : groupMembers) {
+                Socket memberSocket = member.getSocket();
+                OutputStream outputStream = memberSocket.getOutputStream();
+                FileInputStream fileInputStream = new FileInputStream(fileName);
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = bufferedInputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                bufferedInputStream.close();
+                outputStream.close();
+                fileInputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error sending audio to group members.");
+        }
+    }
+
+    // Método para manejar el envío de audio a un usuario
+    private void handleUserAudio(String message, String fileName) {
+        String receiver = message.split(" ")[3];
+        try {
+            clientes.sendAudioToUser(receiver, clientName, fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error sending audio to user.");
+        }
+    }
+        
+    
     private void playCall() throws Exception {
         DatagramSocket serverSocket = new DatagramSocket(6789);
         System.out.println("\nServer started. Waiting for clients...\n");

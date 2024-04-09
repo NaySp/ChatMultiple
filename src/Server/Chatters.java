@@ -3,6 +3,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.net.Socket;
+import java.util.List;
 
 public class Chatters {
     // Conjunto de personas conectadas al chat
@@ -11,6 +13,8 @@ public class Chatters {
 
     public Chatters() {
     }
+
+    
 
     // Verifica si un usuario ya existe en el chat
     public boolean existeUsr(String name) {
@@ -24,11 +28,21 @@ public class Chatters {
         return response;
     }
 
-    // Devuelve el flujo de salida de un usuario en línea
-    public PrintWriter getUserStream(String name) {
+    public Person searchUser(String name) {
         for (Person person : clientes) {
             if (person.getName().equalsIgnoreCase(name)) {
-                return person.getOut();
+                return person;
+            }
+        }
+        return null;
+    }
+    
+
+
+    public Person getUserStream(String name) {
+        for (Person person : clientes) {
+            if (person.getName().equalsIgnoreCase(name)) {
+                return person;
             }
         }
         return null; // Retornar null si el usuario no está en línea o no existe
@@ -36,9 +50,9 @@ public class Chatters {
     
 
     // Agrega un usuario al chat si el nombre no está vacío y no está en uso
-    public void addUsr(String name, PrintWriter out) {
+    public void addUsr(String name, PrintWriter out, Socket socket) {
         if (!name.isBlank() && !existeUsr(name)) {
-            Person p = new Person(name, out);
+            Person p = new Person(name, out, socket);
             clientes.add(p);
         }
     }
@@ -106,6 +120,10 @@ public class Chatters {
         grupos.put(groupName, new HashSet<>());
     }
 
+    public Set<Person> getGroup(String groupName) {
+        return grupos.getOrDefault(groupName, new HashSet<>());
+    }
+
     // Método para agregar un usuario a un grupo
     public void addUserToGroup(String groupName, Person person) {
         if (grupos.containsKey(groupName)) {
@@ -136,5 +154,51 @@ public class Chatters {
                 }
             }
         }
+    }   
+
+    public boolean sendAudioToUser(String receiver, String clientName, String filename) throws IOException {
+        Person receiverPerson = getUserStream(receiver);
+        if (receiverPerson != null) {
+            Socket socket = receiverPerson.getSocket();
+            OutputStream outputStream = socket.getOutputStream();
+            receiverPerson.getOut().println("audio");
+    
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filename))) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
+    
+    public boolean sendAudioToGroup(String groupName, String clientName, String filename) throws IOException {
+        Set<Person> members = grupos.get(groupName);
+        if (members != null) {
+            for (Person person : members) {
+                Socket socket = person.getSocket();
+                OutputStream outputStream = socket.getOutputStream();
+                person.getOut().println("audio");
+    
+                try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filename))) {
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+
+    
+
 }

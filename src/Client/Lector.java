@@ -71,16 +71,13 @@ public class Lector implements Runnable {
             r.dout = new DatagramSocket();
             r.server_ip = inet;
             r.server_port = port_server;
-            Client.calling = true;
+            
             r.start();
         }catch(LineUnavailableException | UnknownHostException | SocketException ex){
             ex.printStackTrace();
         }
 
     }
-    
-    public void end_audio(){
-        Client.calling = false;
-    }
+   
 
 }

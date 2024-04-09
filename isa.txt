@@ -1,4 +1,0 @@
-tapi: hola
-nay: playCall
-isa: playCall
-isa ha abandonado el chat.
