@@ -1,57 +1,111 @@
-# Descripción:
+# Descripción Chat Multiple:
 
-Aplicativo que simula una sala de Chat
-Consultar la guía proporcionada en clase
+Aplicativo que simula una sala de Chat donde se pueden crear grupos de chat, mandar mensajes privados y mandar audios, al igual que enviar mensajes a todos los clientes conectados. Consultar la guía proporcionada en clase para mas información. 
 
-Modulo Server
-Compilar y ejecutar Server.java
+##### Compilar e iniciar el servidor:
 
-Modulo Client
-Compilar y ejecutar Client.java
+Para iniciar el Server, ejecutar por comandos, el comando Server.java
 
-Cada cliente debe usar un nombre de usuario
-diferente. Cuando envía un mensaje a la sala
-el mensaje es enviado a todos incluido el usuario
-que envió el mensaje. Proponer una estrategia 
-para evitar que el mismo usuario reciba el mensaje.
+##### Compilar e iniciar el cliente:
+
+Para iniciar el Client, ejecutar por comandos, el comando Client.java
+
+###### Nota Importante: 
+
+Cada cliente debe de usar un nombre de usuario **diferente**. Cuando envia un mensaje a la sala el mensaje es enviado a todos incluido el usuario que envió el mensaje. Proponer una estrategia para evitar que el mismo usuario reciba el mensaje.
+
+#### Enviar un mensaje privado: 
 
 Si se desea enviar un mensaje privado se debe manejar la sintaxis de manera que:
-usuarioDestino:mensaje
+usuarioDestino: + mensaje
 
-Es decir, desde el chat del destinatario debe ingresar el nombre de hacia quien va el mensaje, ejemplo:
+Es decir, desde el chat del destinatario debe ingresar el nombre del usuario al que desea enviar el mensaje mas el mensaje.
 
-Usuario1
-Usuario2: hola
+**Ejemplo (Esta seria la vista desde comandos del usuario de samuel):**
 
-Entonces Usuario2 verá lo siguiente:
-(chat privado:) Usuario1: hola
+Samuel (Usuario que desea enviar el mensaje)
 
-si se deseas crear un grupo se utiliza el comando /createGroup NOMBRE_GRUPO
-ejemplo: /createGroup Grupo1
-Entonces se verá lo siguiente:
+Isabella: Hola 
+
+**Vista desde el usuario de Isabella** 
+(chat privado:) Samuel: Hola
+
+#### Crear un grupo de chat
+
+Si se deseas crear un grupo se utiliza el comando **/createGroup** +  **NOMBRE_GRUPO**
+
+**Ejemplo:**
+
+/createGroup Grupo1
+
+Después de aplicar el comando se vera lo siguiente:
+
 Grupo 'Grupo1' creado correctamente.
 
-si se deseas ingresar a un grupo se utiliza el comando /join NOMBRE_GRUPO
-ejemplo: /join Grupo1
-Entonces se verá lo siguiente:
+#### Entrar a un grupo
+
+###### Nota importante:
+
+Para entrar a un grupo debe estar creado antes.
+
+Si se desea ingresar a un grupo se utiliza el comando **/join** + **NOMBRE_GRUPO**
+
+**Ejemplo:**
+
+/join Grupo1
+
+Después de aplicar el comando se verá lo siguiente:
+
 Te has unido al grupo 'Grupo1'.
 
-si se deseas enviar un mensaje a un grupo se utiliza el comando /group NOMBRE_GRUPO MENSAJE
-ejemplo: /group Grupo1 mensaje
-Entonces se verá lo siguiente:
+#### Enviar mensaje a un grupo
+
+Si desea enviar un mensaje a un grupo se utiliza el comando **/group** + **NOMBRE_GRUPO**  + **MENSAJE**
+
+**Ejemplo:**
+
+/group Grupo1 mensaje
+
+Después de aplicar el comando se verá lo siguiente:
+
 Mensaje enviado al grupo 'Grupo1'.
 
-si se deseas salirte de un grupo se utiliza el comando /leaveGroup NOMBRE_GRUPO
-ejemplo: /group Grupo1 mensaje
-Entonces se verá lo siguiente:
+#### Salirse de un grupo
+
+Si desea salirse de un grupo se utiliza el comando **/leaveGroup** + **NOMBRE_GRUPO**
+
+**Ejemplo:**
+
+/leaveGroup Grupo1 
+
+Después de aplicar el comando se verá lo siguiente:
+
 Mensaje enviado al grupo 'Grupo1'.
 
+#### Enviar un audio a una persona
 
+Para enviar un audio se utiliza el comando **/recordAudio** + **to** + **NOMBRE_USUARIO**
+
+**Ejemplo:**
+
+/recordAudio to Isabella
+
+Después de aplicar el comando se empezara a grabar el audio y se enviara al otro usuario.
+
+#### Enviar un audio a un grupo 
+
+Para enviar un audio se utiliza el comando **/recordAudio** + **group** + **NOMBRE_GRUPO**
+
+**Ejemplo: **
+
+/recordAudio group Grupo1
+
+Después de aplicar el comando se empezara a grabar el audio y se enviara al grupo.
 
 
 # Integrantes:
 
-- Isabella Ocampo
-- Valentina Gonzales
-- Samuel Alvarez
-- Nayeli Suarez
+- Isabella Ocampo Soto
+- Valentina González Tapiero
+- Samuel Álvarez Alban
+- Nayeli Suarez Portillo

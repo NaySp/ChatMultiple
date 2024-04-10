@@ -56,7 +56,7 @@ class ClientHandler implements Runnable {
                 }else if (message.startsWith("/recordAudio")) {
                     String[] parts = message.split(" ", 2);
                     String target = parts[1];
-                    if (target.startsWith("#")) {
+                    if (target.startsWith("group")) {
                         String groupName = target.substring(1);
                         clientes.sendVoiceMessageToGroup(groupName, clientName);
                     } else if (target.startsWith("to")) {
