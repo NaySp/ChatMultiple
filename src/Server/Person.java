@@ -1,15 +1,16 @@
+import java.util.Set;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+//
 public class Person {
     private String name;
-    private PrintWriter out;
-    private Socket socket;
+    PrintWriter out;
+    private AudioRecorder audioRecorder;
 
-    public Person(String name, PrintWriter out, Socket socket){
+    public Person(String name, PrintWriter out){
         this.name = name;
         this.out  = out;
-        this.socket = socket;
     }
    
     public String getName() {
@@ -20,8 +21,10 @@ public class Person {
         return out;
     }
 
-    public Socket getSocket() {
-        return socket;
-    }  
     
+    public AudioRecorder  getAudioRecorder(){
+        audioRecorder =new AudioRecorder();
+        return audioRecorder;
+    }
+
 }

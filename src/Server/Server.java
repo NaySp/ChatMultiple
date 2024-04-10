@@ -1,16 +1,16 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Scanner;
 
 public class Server {
 
     private static Set<PrintWriter> writers = new HashSet<>();
-    public static boolean calling = false;
-    public static Server_voice sv = new Server_voice(); 
 
     public static void main(String[] args) {
 
-        sv.init_audio();        
         int PORT = 6789;
         Chatters clientes = new Chatters();
 
@@ -30,8 +30,5 @@ public class Server {
             e.printStackTrace();
         }
     }
-
-    
-
 
 }

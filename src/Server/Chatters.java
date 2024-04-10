@@ -3,8 +3,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.net.Socket;
-import java.util.List;
 
 public class Chatters {
     // Conjunto de personas conectadas al chat
@@ -13,8 +11,6 @@ public class Chatters {
 
     public Chatters() {
     }
-
-    
 
     // Verifica si un usuario ya existe en el chat
     public boolean existeUsr(String name) {
@@ -28,31 +24,10 @@ public class Chatters {
         return response;
     }
 
-    public Person searchUser(String name) {
-        for (Person person : clientes) {
-            if (person.getName().equalsIgnoreCase(name)) {
-                return person;
-            }
-        }
-        return null;
-    }
-    
-
-
-    public Person getUserStream(String name) {
-        for (Person person : clientes) {
-            if (person.getName().equalsIgnoreCase(name)) {
-                return person;
-            }
-        }
-        return null; // Retornar null si el usuario no está en línea o no existe
-    }
-    
-
     // Agrega un usuario al chat si el nombre no está vacío y no está en uso
-    public void addUsr(String name, PrintWriter out, Socket socket) {
+    public void addUsr(String name, PrintWriter out) {
         if (!name.isBlank() && !existeUsr(name)) {
-            Person p = new Person(name, out, socket);
+            Person p = new Person(name, out);
             clientes.add(p);
         }
     }
@@ -120,10 +95,6 @@ public class Chatters {
         grupos.put(groupName, new HashSet<>());
     }
 
-    public Set<Person> getGroup(String groupName) {
-        return grupos.getOrDefault(groupName, new HashSet<>());
-    }
-
     // Método para agregar un usuario a un grupo
     public void addUserToGroup(String groupName, Person person) {
         if (grupos.containsKey(groupName)) {
@@ -154,51 +125,56 @@ public class Chatters {
                 }
             }
         }
-    }   
-
-    public boolean sendAudioToUser(String receiver, String clientName, String filename) throws IOException {
-        Person receiverPerson = getUserStream(receiver);
-        if (receiverPerson != null) {
-            Socket socket = receiverPerson.getSocket();
-            OutputStream outputStream = socket.getOutputStream();
-            receiverPerson.getOut().println("audio");
-    
-            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filename))) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
-    
-    public boolean sendAudioToGroup(String groupName, String clientName, String filename) throws IOException {
-        Set<Person> members = grupos.get(groupName);
-        if (members != null) {
-            for (Person person : members) {
-                Socket socket = person.getSocket();
-                OutputStream outputStream = socket.getOutputStream();
-                person.getOut().println("audio");
-    
-                try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filename))) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+
+    public boolean existsGroup(String groupName) {
+        return grupos.containsKey(groupName);
     }
     
 
-    
+    public void sendVoiceMessageToGroup(String groupName, String senderName) {
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        for (Person p : clientes) {
+            if (senderName.equals(p.getName())) {
+                p.getOut().println("Grabando...");
+                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
+                p.getOut().println("Grabación terminada");
+            }
+        }
+
+        if (existsGroup(groupName)) {
+            Set<Person> groupMembers = grupos.get(groupName);
+            for (Person member : groupMembers) {
+                // Verificar si el miembro no es el remitente del mensaje de voz
+                if (!member.getName().equals(senderName)) {
+                    PrintWriter out = member.getOut();
+                    out.println("[Group: " + groupName + ", Sender: " + senderName + "] Audio:");
+                    out.println("Reproduciendo");
+                    member.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
+                }
+            }
+        }
+
+    }
+
+    public void sendPrivateVoiceMessage(String senderName, String recipientName){
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        for (Person p: clientes) {
+            if (senderName == p.getName()){
+                p.getOut().println("Grabando...");
+                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
+                p.getOut().println("Grabacion terminada");
+            }
+        }
+        for (Person p : clientes) {
+            if (recipientName.equals(p.getName())) {
+                p.getOut().println("[Private audio from " + senderName + "] ");
+                p.getOut().println("Reproduciendo");
+                p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
+            }
+        }
+       
+    }
+
 
 }
