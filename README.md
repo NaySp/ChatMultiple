@@ -84,21 +84,23 @@ Mensaje enviado al grupo 'Grupo1'.
 
 #### Enviar un audio a una persona
 
-Para enviar un audio se utiliza el comando **/recordAudio** + **to** + **NOMBRE_USUARIO**
+Para enviar un audio se utiliza el comando **/recordAudio** + **-** + **NOMBRE_USUARIO** 
+(Por favor que no haya espacio seguido del guion)
 
 **Ejemplo:**
 
-/recordAudio to Isabella
+/recordAudio -Isabella
 
 Después de aplicar el comando se empezara a grabar el audio y se enviara al otro usuario.
 
 #### Enviar un audio a un grupo 
 
 Para enviar un audio se utiliza el comando **/recordAudio** + **group** + **NOMBRE_GRUPO**
+(Por favor que no haya espacio luego del group)
 
 **Ejemplo: **
 
-/recordAudio group Grupo1
+/recordAudio groupGrupo1
 
 Después de aplicar el comando se empezara a grabar el audio y se enviara al grupo.
 

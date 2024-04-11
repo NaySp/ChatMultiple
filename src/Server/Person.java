@@ -19,12 +19,10 @@ public class Person {
     
     public PrintWriter getOut() {
         return out;
-    }
+    }  
 
-    
     public AudioRecorder  getAudioRecorder(){
         audioRecorder =new AudioRecorder();
         return audioRecorder;
     }
-
 }

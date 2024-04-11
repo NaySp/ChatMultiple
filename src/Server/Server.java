@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class Server {
 
     private static Set<PrintWriter> writers = new HashSet<>();
+    public static boolean calling;
 
     public static void main(String[] args) {
 

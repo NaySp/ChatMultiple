@@ -74,6 +74,20 @@ public class Chatters {
         }
     }
 
+    public void crearGrupo(String groupName) {
+        grupos.put(groupName, new HashSet<>());
+    }
+
+    // Método para agregar un usuario a un grupo
+    public void addUserToGroup(String groupName, Person person) {
+        if (grupos.containsKey(groupName)) {
+            grupos.get(groupName).add(person);
+            person.getOut().println("Te has unido al grupo '" + groupName + "'.");
+        } else {
+            person.getOut().println("El grupo '" + groupName + "' no existe.");
+        }
+    }
+
     public void guardarMensaje(String cliente, String mensaje) {
         // Buscar al cliente en el conjunto de clientes
         for (Person p : clientes) {
@@ -91,28 +105,6 @@ public class Chatters {
         }
     }
 
-    public void createGroup(String groupName) {
-        grupos.put(groupName, new HashSet<>());
-    }
-
-    // Método para agregar un usuario a un grupo
-    public void addUserToGroup(String groupName, Person person) {
-        if (grupos.containsKey(groupName)) {
-            grupos.get(groupName).add(person);
-            person.getOut().println("Te has unido al grupo '" + groupName + "'.");
-        } else {
-            person.getOut().println("El grupo '" + groupName + "' no existe.");
-        }
-    }
-
-    // Método para enviar un mensaje a un grupo
-    public void sendMessageToGroup(String groupName, String message) {
-        if (grupos.containsKey(groupName)) {
-            for (Person person : grupos.get(groupName)) {
-                person.getOut().println(message);
-            }
-        }
-    }
 
     public void removeUserFromGroup(String groupName, String userName) {
         if (grupos.containsKey(groupName)) {
@@ -127,12 +119,42 @@ public class Chatters {
         }
     }
 
+    public void mandarMensajeVozPrivado(String senderName, String recipientName){
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        for (Person p: clientes) {
+            if (senderName == p.getName()){
+                p.getOut().println("Grabando...");
+                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
+                p.getOut().println("Grabacion terminada");
+            }
+        }
+        for (Person p : clientes) {
+            if (recipientName.equals(p.getName())) {
+                p.getOut().println("[Private audio from " + senderName + "] ");
+                p.getOut().println("Reproduciendo");
+                p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
+            }
+        }
+       
+    }
+
+
+     // Método para enviar un mensaje a un grupo
+    public void enviarMensajeAlGrupo(String groupName, String message) {
+        if (grupos.containsKey(groupName)) {
+            for (Person person : grupos.get(groupName)) {
+                person.getOut().println(message);
+            }
+        }
+    }
+
+
     public boolean existsGroup(String groupName) {
         return grupos.containsKey(groupName);
     }
     
 
-    public void sendVoiceMessageToGroup(String groupName, String senderName) {
+    public void mandarMensajeVozGrupo(String groupName, String senderName) {
         ByteArrayOutputStream byteArrayOutputStream = null;
         for (Person p : clientes) {
             if (senderName.equals(p.getName())) {
@@ -157,24 +179,6 @@ public class Chatters {
 
     }
 
-    public void sendPrivateVoiceMessage(String senderName, String recipientName){
-        ByteArrayOutputStream byteArrayOutputStream = null;
-        for (Person p: clientes) {
-            if (senderName == p.getName()){
-                p.getOut().println("Grabando...");
-                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
-                p.getOut().println("Grabacion terminada");
-            }
-        }
-        for (Person p : clientes) {
-            if (recipientName.equals(p.getName())) {
-                p.getOut().println("[Private audio from " + senderName + "] ");
-                p.getOut().println("Reproduciendo");
-                p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
-            }
-        }
-       
-    }
 
 
 }

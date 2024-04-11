@@ -5,6 +5,7 @@ public class Client {
     // Dirección IP y puerto del servidor
     private static final String SERVER_IP = "127.0.0.1";
     private static final int PORT = 6789;
+    public static boolean calling;
 
     public static void main(String[] args) {
         try {

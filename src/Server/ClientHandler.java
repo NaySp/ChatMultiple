@@ -46,45 +46,45 @@ class ClientHandler implements Runnable {
             // Esperar y manejar mensajes de los clientes
             while ((message = in.readLine()) != null) {
                 if (message.startsWith("/createGroup")) {
-                    handleCreateGroup(message);
+                    crearGrupo(message);
                 } else if (message.startsWith("/join")) {
-                    handleJoinGroup(message);
+                    unirseGrupo(message);
                 } else if (message.startsWith("/group")) {
-                    handleGroupMessage(message);
+                    envioMensajeGrupo(message);
                 } else if (message.startsWith("/leaveGroup")) {
-                    handleLeaveGroup(message);
+                    salirDelGrupo(message);
                 }else if (message.startsWith("/recordAudio")) {
                     String[] parts = message.split(" ", 2);
                     String target = parts[1];
                     if (target.startsWith("group")) {
                         String groupName = target.substring(1);
-                        clientes.sendVoiceMessageToGroup(groupName, clientName);
-                    } else if (target.startsWith("to")) {
+                        clientes.mandarMensajeVozGrupo(groupName, clientName);
+                    } else if (target.startsWith("-")) {
                         String receiverUser = target.substring(1);
-                        clientes.sendPrivateVoiceMessage(clientName, receiverUser);
+                        clientes.mandarMensajeVozPrivado(clientName, receiverUser);
                     }
                 } else if (message.contains(":")) {
-                    handlePrivateMessage(message);
+                    envioMensajePrivado(message);
                 } else {
                     clientes.broadcastMessage(clientName + ": " + message);
                 }
             }
         } catch (IOException e) {
-            // Manejar errores de E/S
+           
         } finally {
             try {
-                // Cerrar el socket y eliminar al usuario del chat al salir
+               
                 clientSocket.close();
                 System.out.println(clientName + " ha abandonado el chat.");
                 clientes.broadcastMessage(clientName + " ha abandonado el chat.");
                 clientes.removeUsr(clientName);
             } catch (IOException e) {
-                // Manejar errores al cerrar el socket
+            
             }
         }
     }
 
-    private void handleJoinGroup(String message) {
+    private void unirseGrupo(String message) {
         String[] parts = message.split(" ");
         if (parts.length >= 2) {
             String groupName = parts[1];
@@ -93,26 +93,26 @@ class ClientHandler implements Runnable {
         }
     }
 
-    private void handleGroupMessage(String message) {
+
+    private void crearGrupo(String message) {
+        String[] parts = message.split(" ");
+        if (parts.length >= 2) {
+            String groupName = parts[1];
+            clientes.crearGrupo(groupName);
+            out.println("Grupo '" + groupName + "' creado correctamente.");
+        }
+    }
+    private void envioMensajeGrupo(String message) {
         String[] parts = message.split(" ", 3);
         if (parts.length >= 3) {
             String groupName = parts[1];
             String groupMessage = parts[2];
-            clientes.sendMessageToGroup(groupName, clientName + ": " + groupMessage);
+            clientes.enviarMensajeAlGrupo(groupName, clientName + ": " + groupMessage);
             out.println("Mensaje enviado al grupo '" + groupName + "'.");
         }
     }
 
-    private void handleCreateGroup(String message) {
-        String[] parts = message.split(" ");
-        if (parts.length >= 2) {
-            String groupName = parts[1];
-            clientes.createGroup(groupName);
-            out.println("Grupo '" + groupName + "' creado correctamente.");
-        }
-    }
-
-    private void handleLeaveGroup(String message) {
+    private void salirDelGrupo(String message) {
         String[] parts = message.split(" ");
         if (parts.length >= 2) {
             String groupName = parts[1];
@@ -120,10 +120,13 @@ class ClientHandler implements Runnable {
         }
     }
 
-    private void handlePrivateMessage(String message) {
+    private void envioMensajePrivado(String message) {
         String[] parts = message.split(":", 2);
         String receiver = parts[0].trim();
         String privateMessage = parts[1].trim();
         clientes.sendMessageToUser(clientName, receiver, privateMessage);
     }
+
+
+    
 }
