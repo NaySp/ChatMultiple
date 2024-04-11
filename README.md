@@ -104,6 +104,15 @@ Para enviar un audio se utiliza el comando **/recordAudio** + **group** + **NOMB
 
 Después de aplicar el comando se empezara a grabar el audio y se enviara al grupo.
 
+#### Hacer una llamada
+
+Para hacer una llamada **/calling** 
+
+**Ejemplo: **
+
+/calling
+
+
 
 # Integrantes:
 

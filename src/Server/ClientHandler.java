@@ -53,6 +53,8 @@ class ClientHandler implements Runnable {
                     envioMensajeGrupo(message);
                 } else if (message.startsWith("/leaveGroup")) {
                     salirDelGrupo(message);
+                } else if (message.startsWith("/calling")) {
+                    startAudioStream();
                 }else if (message.startsWith("/recordAudio")) {
                     String[] parts = message.split(" ", 2);
                     String target = parts[1];
@@ -127,6 +129,12 @@ class ClientHandler implements Runnable {
         clientes.sendMessageToUser(clientName, receiver, privateMessage);
     }
 
+    private void startAudioStream() {
+        AudioStreamer audioStreamer = new AudioStreamer();
+        audioStreamer.startStreaming();
+    }
+
+ 
 
     
 }
